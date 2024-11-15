@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Перекладач</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #ff9a8b, #ff6a88, #d58e9d);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+
+    h1, h2 {
+      font-family: 'Lora', serif;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+
+    form {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 35px;
+      border-radius: 18px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 500px;
+      backdrop-filter: blur(8px);
+      animation: slideIn 1s ease-out;
+    }
+
+    textarea, select, button {
+      width: 100%;
+      margin-bottom: 18px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 16px;
+      background-color: #f1f1f1;
+      color: #333;
+      transition: all 0.3s ease;
+    }
+
+    textarea {
+      resize: vertical;
+      font-family: 'Courier New', monospace;
+    }
+
+    label {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    button {
+      background-color: #ff6a88;
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 14px;
+      border-radius: 12px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #f56a8d;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    textarea:focus, select:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 5px rgba(255, 106, 136, 0.8);
+      border-color: #ff6a88;
+    }
+
+
+    .output, .history {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 750px;
+      margin-top: 30px;
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    .output p {
+      font-size: 18px;
+      color: #ff6a88;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 2px solid #eee;
+    }
+
+    th {
+      background-color: #ff6a88;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background-color: #f7f7f7;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    @media (max-width: 768px) {
+      h1, h2 {
+        font-size: 24px;
+      }
+
+      form {
+        padding: 20px;
+      }
+
+      textarea {
+        font-size: 14px;
+      }
+
+      button {
+        font-size: 16px;
+      }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(0); }
+    }
+
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<h1>Переклад з української на англійську та навпаки</h1>
+
+<form action="/translate" method="post">
+  <textarea name="text" placeholder="Введіть текст для перекладу" rows="4"></textarea><br>
+  <label for="sourceLang">Мова джерела:</label>
+  <select name="sourceLang" id="sourceLang" required>
+    <option value="uk">Українська</option>
+    <option value="en">Англійська</option>
+  </select><br>
+
+  <label for="targetLang">Мова перекладу:</label>
+  <select name="targetLang" id="targetLang" required>
+    <option value="uk">Українська</option>
+    <option value="en">Англійська</option>
+  </select><br>
+
+  <button type="submit">Перекласти</button>
+</form>
+
+<div class="output">
+  <h2>Перекладений текст:</h2>
+  <p th:text="${translatedText}"></p>
+</div>
+
+<div class="history">
+  <h2>Історія перекладів:</h2>
+  <table>
+    <tr>
+      <th>Оригінальний текст</th>
+      <th>Перекладений текст</th>
+      <th>Мова джерела</th>
+      <th>Мова перекладу</th>
+    </tr>
+    <tr th:each="history : ${history}">
+      <td th:text="${history.originalText}"></td>
+      <td th:text="${history.translatedText}"></td>
+      <td th:text="${history.sourceLang}"></td>
+      <td th:text="${history.targetLang}"></td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>
